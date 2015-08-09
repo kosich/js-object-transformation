@@ -12,11 +12,13 @@ describe('Basic transformation', function(){
 
     describe('With no transformation passed', function(){
         it('will return non object value as is', function(){
-            sut(4).should.equal(4);
+            sut(4)
+                .should.equal(4);
         });
 
         it('will return object if second arg wasnt passed', function(){
-            sut({ a: 1 }).should.eql({a: 1});
+            sut({ a: 1 })
+                .should.eql({a: 1});
         });
     });
 
@@ -45,12 +47,19 @@ describe('Object transformation', function(){
             source.a = '_a_';
         })
 
-        it('will change name', ()=>{
+        it('will move string', ()=>{
             target.x = '$.a';
 
             sut(source, target)
                 .should.have.property('x', '_a_');
+        });
 
+        it('will move one boolean', function(){
+            source.a = false;
+            target.x = '$.a';
+
+            (sut(source, target).x)
+                .should.equal(false)
         });
 
         it('will move two simple values', ()=>{
