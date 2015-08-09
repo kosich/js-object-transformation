@@ -12,37 +12,24 @@ function transform(source, transformation){
         return get_property(source, path);
     }
 
-    let target = transformation;
+    if (typeof transformation !== 'object'){
+        return;
+    }
 
+    // TODO: this wont work with multiple globals
+    // use ducktyping instead
+    if (transformation instanceof Array){
+        let path = transformation[0].split(/\./);
+        let func = transformation[1];
+        return get_property(source, path, func)
+    }
+
+    // default subitems gothrough
+    let result = transformation;
     Object.keys(transformation).forEach(key=>{
-
-        let value = transformation[ key ];
-
-        if (typeof value === 'string'){
-            let path = value.split(/\./);
-            let src_value = get_property(source, path);
-            target[key] = src_value;
-        }
-
-        if (typeof value === 'function'){
-            target[key] = value(source);
-        }
-
-        if (typeof value === 'object'){
-            // TODO: this wont work with multiple globals
-            // use ducktyping instead
-            if (value instanceof Array){
-                let path = value[0].split(/\./);
-                let func = value[1];
-                target[key] = get_property(source, path, func)
-            } else {
-                target[key] = transform(source, value);
-            }
-        }
-
+        result[key] = transform(source, transformation[key]);
     });
-
-    return target;
+    return result;
 }
 
 function get_property(source, path, func){
