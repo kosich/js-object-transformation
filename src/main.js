@@ -11,7 +11,7 @@ function transform(source, mod){
             // TODO: this wont work with multiple globals
             // use ducktyping instead
             if (mod instanceof Array){
-                let [path, func ] = mod;
+                let [ path, func ] = mod;
                 path = path.split(/\./);
                 let property = get_property(source, path, func);
                 if (!func){
@@ -36,12 +36,29 @@ function transform(source, mod){
 
 function get_property(source, path){
     let key = path.shift();
+    let is_array = /.*\[\*\]/.test(key);
+
+    if (is_array){
+        key = key.replace(/\[\*\]/, '');
+    }
+
+    let value;
+    if (is_array){
+        let result = [];
+        for(let item of source){
+            result.push(get_property(item, [].concat(path)));
+        }
+        return result;
+    } else {
+        value = source[key];
+    }
 
     if ('$' === key){
         return get_property(source, path);
     }
 
-    let value = source[key];
+
+    // final path part
     if (!path.length){
         return value;
     }
@@ -49,7 +66,7 @@ function get_property(source, path){
     // TODO: check for drilling into simple value type
     // no way to drill down
     if (undefined  === value || null === value){
-        return undefined;
+        return value;
     }
 
     return get_property(source[key], path);

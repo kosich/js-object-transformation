@@ -121,7 +121,7 @@ describe('Object transformation', function(){
                 ['$.a.b.c', source_value => source_value + '-value']
             }}};
 
-        })
+        });
 
         it('will get and evaluate property value', function(){
             sut(source, target)
@@ -130,5 +130,24 @@ describe('Object transformation', function(){
             });
         });
     });
+
+    describe('Arrays', function(){
+        it('will transform simple array', function(){
+            source = [ {a: 1}, {a: 2}, {a: 3}];
+            target = '$[*].a';
+
+            sut(source, target)
+                .should.eql( [1, 2, 3] );
+        });
+
+        it('will transform simple sub array', function(){
+            source.a = [ {b: 1}, {b: 2}, {b: 3}];
+            target = '$.a[*].b';
+
+            sut(source, target)
+                .should.eql( [1, 2, 3] );
+        });
+    });
+
 });
 
