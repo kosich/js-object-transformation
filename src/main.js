@@ -42,19 +42,26 @@ function get_property(source, path){
         key = key.replace(/\[\*\]/, '');
     }
 
+    let is_root = ('$' === key);
+
     let value;
-    if (is_array){
-        let result = [];
-        for(let item of source){
-            result.push(get_property(item, [].concat(path)));
-        }
-        return result;
+
+    if (is_root){
+        value = source;
     } else {
         value = source[key];
     }
 
-    if ('$' === key){
-        return get_property(source, path);
+    if (is_array){
+        let result = [];
+        for(let item of value){
+            result.push(get_property(item, [].concat(path)));
+        }
+        return result;
+    }
+
+    if (is_root){
+        return get_property(value, path);
     }
 
 
