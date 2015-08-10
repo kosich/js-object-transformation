@@ -55,6 +55,7 @@ function get_property(source, path){
     if (is_array){
         let result = [];
         for(let item of value){
+            console.log(`key ${key} for item ${item} for path ${ path }`);
             result.push(get_property(item, [].concat(path)));
         }
         return result;

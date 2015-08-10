@@ -147,6 +147,14 @@ describe('Object transformation', function(){
             sut(source, target)
                 .should.eql( [1, 2, 3] );
         });
+
+        it.only('will transform array with subarray', function(){
+            source.a = [ {b: [ 1, 2 ]}, {b: [ 2, 3 ]}, {b: [ 3, 4 ]}];
+            target = { x:'$.a[*].b[*]' };
+
+            sut(source, target)
+                .should.eql({ x: [[1,2], [2,3], [3,4]] });
+        });
     });
 
 });
