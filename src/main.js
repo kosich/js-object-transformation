@@ -13,7 +13,7 @@ function transform(source, mod){
             if (mod instanceof Array){
                 let [ path, func ] = mod;
                 path = path.split(/\./);
-                let property = get_property(source, path, func);
+                let property = get_property(source, path);
                 if (!func){
                     return property;
                 }
@@ -52,10 +52,15 @@ function get_property(source, path){
         value = source[key];
     }
 
+    // final path part
+    if (0 === path.length){
+        return value;
+    }
+
+
     if (is_array){
         let result = [];
         for(let item of value){
-            console.log(`key ${key} for item ${item} for path ${ path }`);
             result.push(get_property(item, [].concat(path)));
         }
         return result;
@@ -65,11 +70,6 @@ function get_property(source, path){
         return get_property(value, path);
     }
 
-
-    // final path part
-    if (!path.length){
-        return value;
-    }
 
     // TODO: check for drilling into simple value type
     // no way to drill down

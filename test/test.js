@@ -148,7 +148,7 @@ describe('Object transformation', function(){
                 .should.eql( [1, 2, 3] );
         });
 
-        it.only('will transform array with subarray', function(){
+        it('will transform array with subarray', function(){
             source.a = [ {b: [ 1, 2 ]}, {b: [ 2, 3 ]}, {b: [ 3, 4 ]}];
             target = { x:'$.a[*].b[*]' };
 
