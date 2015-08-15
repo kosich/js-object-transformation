@@ -19,7 +19,7 @@ function transform(source, mod){
                 let func = mod[last_index];
 
                 if (!paths.length){
-                    throw 'Thou shall pass path';
+                    throw new Error('Thou shall pass path');
                 }
 
                 let values = paths.map(path=>{
