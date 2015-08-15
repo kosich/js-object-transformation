@@ -9,15 +9,25 @@ function transform(source, mod){
         },
         object(){
             // TODO: this wont work with multiple globals
+            // nor will it work with `arguments'
             // use ducktyping instead
             if (mod instanceof Array){
-                let [ path, func ] = mod;
-                path = path.split(/\./);
-                let property = get_property(source, path);
-                if (!func){
-                    return property;
+                // syntax for arr-mod is
+                // path_1 [,..path_2, .., path_N], function
+                let last_index = mod.length - 1; 
+                let paths = mod.slice(0, last_index);
+                let func = mod[last_index];
+
+                if (!paths.length){
+                    throw 'Thou shall pass path';
                 }
-                return func(property);
+
+                let values = paths.map(path=>{
+                    path = path.split(/\./);
+                    return get_property(source, path);
+                });
+
+                return func(...values);
             }
 
             // default subitems gothrough

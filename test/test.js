@@ -114,20 +114,30 @@ describe('Object transformation', function(){
     });
 
     describe('Source path with function', function(){
-        beforeEach(function(){
-            source.a = { b: { c: 'src'}};
-
-            target = { x: { y: { z: 
-                ['$.a.b.c', source_value => source_value + '-value']
-            }}};
-
-        });
 
         it('will get and evaluate property value', function(){
+            source.a = { b: { c: 'src'}};
+            target = { x: { y: { z: 
+                ['$.a.b.c', source_value=>source_value + '-value']
+            }}};
+
             sut(source, target)
-            .should.eql({
-                x : { y : { z: 'src-value' } }
-            });
+                .should.eql({
+                    x : { y : { z: 'src-value' } }
+                });
+        });
+
+        it('will get several values and evaluate property value', function(){
+            source.a = '_a_';
+            source.b = '_b_';
+            target.x = [ '$.a', '$.b', (a, b)=>a+b ];
+            target.z = [ '$', $=>$.b + $.a ];
+
+            sut(source, target)
+                .should.eql({
+                    x: '_a__b_',
+                    z: '_b__a_'
+                });
         });
     });
 
