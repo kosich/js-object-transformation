@@ -1,11 +1,11 @@
 import {should} from 'should';
 import sut from '../src/main.js';
 
-let source, target;
+let src, mod;
 
 beforeEach(()=>{
-    source = {};
-    target = {};
+    src = {};
+    mod = {};
 });
 
 describe('Basic transformation', function(){
@@ -24,14 +24,14 @@ describe('Basic transformation', function(){
 
     describe('With simple transformation', ()=>{
         it('will return value for path', function(){
-            source.a = { b: { c: 'value' } };
-            sut(source, '$.a.b.c')
+            src.a = { b: { c: 'value' } };
+            sut(src, '$.a.b.c')
                 .should.equal('value');
         });
 
         it('will transform object with function', ()=>{
-            source.a = 'value';
-            sut(source, o => o.a)
+            src.a = 'value';
+            sut(src, o => o.a)
                 .should.equal('value');
         });
     });
@@ -44,31 +44,31 @@ describe('Object transformation', function(){
     describe('Simple transformations', function(){
 
         beforeEach(()=>{
-            source.a = '_a_';
+            src.a = '_a_';
         })
 
         it('will move string', ()=>{
-            target.x = '$.a';
+            mod.x = '$.a';
 
-            sut(source, target)
+            sut(src, mod)
                 .should.have.property('x', '_a_');
         });
 
         it('will move one boolean', function(){
-            source.a = false;
-            target.x = '$.a';
+            src.a = false;
+            mod.x = '$.a';
 
-            (sut(source, target).x)
+            (sut(src, mod).x)
                 .should.equal(false)
         });
 
         it('will move two simple values', ()=>{
-            source.b = '_b_';
+            src.b = '_b_';
 
-            target.x = '$.a';
-            target.y = '$.b';
+            mod.x = '$.a';
+            mod.y = '$.b';
 
-            let result = sut(source, target);
+            let result = sut(src, mod);
 
             result.should.have.property('x', '_a_');
             result.should.have.property('y', '_b_');
@@ -79,61 +79,61 @@ describe('Object transformation', function(){
     describe('Subitems', function(){
 
         it('will set subitem', function(){
-            source.a = 'value';
-            target.x = { y : '$.a' };
+            src.a = 'value';
+            mod.x = { y : '$.a' };
             
-            sut(source, target)
+            sut(src, mod)
                 .should.eql({ x: { y: 'value' } });
         });
 
         it('will set subitem from subitem', function(){
-            source.a = { b: { c: 'value'}};
-            target.x = { y: { z: '$.a.b.c'}};
+            src.a = { b: { c: 'value'}};
+            mod.x = { y: { z: '$.a.b.c'}};
             
-            sut(source, target)
+            sut(src, mod)
                 .should.eql({ x: { y: { z: 'value'}}});
         });
 
         it('will copy object to subitem', function(){
-            source.a = { b: { c: 'value'}};
-            target.x = { y: '$.a.b'};
+            src.a = { b: { c: 'value'}};
+            mod.x = { y: '$.a.b'};
             
-            sut(source, target)
+            sut(src, mod)
                 .should.eql({ x: { y: { c: 'value'}}});
         });
     });
 
     describe('Functions as setters', function(){
         it('will evaluate property value', function(){
-            target.a = source => source.value + '-value';
-            source.value = 'src';
+            mod.a = src => src.value + '-value';
+            src.value = 'src';
 
-            sut(source, target)
+            sut(src, mod)
                 .should.have.property('a', 'src-value');
         });
     });
 
-    describe('Source path with function', function(){
+    describe('src path with function', function(){
 
         it('will get and evaluate property value', function(){
-            source.a = { b: { c: 'src'}};
-            target = { x: { y: { z: 
+            src.a = { b: { c: 'src'}};
+            mod = { x: { y: { z: 
                 ['$.a.b.c', source_value=>source_value + '-value']
             }}};
 
-            sut(source, target)
+            sut(src, mod)
                 .should.eql({
                     x : { y : { z: 'src-value' } }
                 });
         });
 
         it('will get several values and evaluate property value', function(){
-            source.a = '_a_';
-            source.b = '_b_';
-            target.x = [ '$.a', '$.b', (a, b)=>a+b ];
-            target.z = [ '$', $=>$.b + $.a ];
+            src.a = '_a_';
+            src.b = '_b_';
+            mod.x = [ '$.a', '$.b', (a, b)=>a+b ];
+            mod.z = [ '$', $=>$.b + $.a ];
 
-            sut(source, target)
+            sut(src, mod)
                 .should.eql({
                     x: '_a__b_',
                     z: '_b__a_'
@@ -143,26 +143,26 @@ describe('Object transformation', function(){
 
     describe('Arrays', function(){
         it('will transform simple array', function(){
-            source = [ {a: 1}, {a: 2}, {a: 3}];
-            target = '$[*].a';
+            src = [ {a: 1}, {a: 2}, {a: 3}];
+            mod = '$[*].a';
 
-            sut(source, target)
+            sut(src, mod)
                 .should.eql( [1, 2, 3] );
         });
 
         it('will transform simple sub array', function(){
-            source.a = [ {b: 1}, {b: 2}, {b: 3}];
-            target = '$.a[*].b';
+            src.a = [ {b: 1}, {b: 2}, {b: 3}];
+            mod = '$.a[*].b';
 
-            sut(source, target)
+            sut(src, mod)
                 .should.eql( [1, 2, 3] );
         });
 
         it('will transform array with subarray', function(){
-            source.a = [ {b: [ 1, 2 ]}, {b: [ 2, 3 ]}, {b: [ 3, 4 ]}];
-            target = { x:'$.a[*].b[*]' };
+            src.a = [ {b: [ 1, 2 ]}, {b: [ 2, 3 ]}, {b: [ 3, 4 ]}];
+            mod = { x:'$.a[*].b[*]' };
 
-            sut(source, target)
+            sut(src, mod)
                 .should.eql({ x: [[1,2], [2,3], [3,4]] });
         });
     });

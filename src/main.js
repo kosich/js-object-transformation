@@ -1,11 +1,11 @@
-function transform(source, mod){
+function transform(src, mod){
     let handler = {
-        undefined: ()=>source,
-        null: ()=>source,
-        function: ()=> mod(source),
+        undefined: ()=>src,
+        null: ()=>src,
+        function: ()=> mod(src),
         string(){
             let path = mod.split(/\./);
-            return get_property(source, path);
+            return get_property(src, path);
         },
         object(){
             // TODO: this wont work with multiple globals
@@ -24,7 +24,7 @@ function transform(source, mod){
 
                 let values = paths.map(path=>{
                     path = path.split(/\./);
-                    return get_property(source, path);
+                    return get_property(src, path);
                 });
 
                 return func(...values);
@@ -34,7 +34,7 @@ function transform(source, mod){
             // TODO: might want to make zero object here
             let result = {};
             for(let key of Object.keys(mod)){
-                result[key] = transform(source, mod[key]);
+                result[key] = transform(src, mod[key]);
             }
             return result;
         }
@@ -44,7 +44,7 @@ function transform(source, mod){
 }
 
 
-function get_property(source, path){
+function get_property(src, path){
     let key = path.shift();
     let is_array = /.*\[\*\]/.test(key);
 
@@ -57,9 +57,9 @@ function get_property(source, path){
     let value;
 
     if (is_root){
-        value = source;
+        value = src;
     } else {
-        value = source[key];
+        value = src[key];
     }
 
     // final path part
@@ -87,7 +87,7 @@ function get_property(source, path){
         return value;
     }
 
-    return get_property(source[key], path);
+    return get_property(src[key], path);
 }
 
 export default transform;
