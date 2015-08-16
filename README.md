@@ -12,11 +12,26 @@ Is not published to any package manager repo
 
 JSON path syntax is not fully supported (e.g. no relative paths, no array items by index etc)
 
-# Example
+# Examples
 
 ```js
-import transform from 'transform';
+import transform from '../src/main.js';
+```
 
+#### Simple
+```js
+// get value from 'a' property
+transform({ a: '_a_' }, '$.a'); // > '_a_'
+
+// get value from the sub property
+transform({ a: { b: '_b_' }}, '$.a.b'); // > '_b_'
+
+// get array and apply some modificator to it
+transform({ c: [1, 5, 2, 3] }, ['$.c[*]', c=>Math.max(...c) ]); // > 5
+```
+
+#### Object
+```js
 let src = {
     a: { sub: 'bio' },
     b: 'hazard',
