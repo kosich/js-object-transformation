@@ -1,4 +1,18 @@
-A tool to transform one object into another
+# Intro
+
+A tool to transform one js object into another
+
+### Word of warning
+
+This code is at version **0.0.0** so its interface might be changed in the future
+
+Code is written in **es6** *(a.k.a. js2015)* and needs [babel](https://babeljs.io/docs/usage/cli/) for transpiling and running unit tests
+
+Is not published to any package manager repo
+
+JSON path syntax is not fully supported (e.g. no relative paths, no array items by index etc)
+
+# Example
 
 ```js
 import transform from 'transform';
